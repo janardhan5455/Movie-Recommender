@@ -1,5 +1,7 @@
+from collabarative import populer
 from flask import Flask, request ,jsonify, render_template
 from  movie_recomend import *
+from collabarative import *
 
 app = Flask(__name__)
 
@@ -25,7 +27,8 @@ def mov():
 
 @app.route('/')
 def main():
-    return render_template('./index.html',movies=None)
+    pop_movies=populer()
+    return render_template('./home.html',pop_movies=pop_movies)
 
 
 if __name__ == '__main__':

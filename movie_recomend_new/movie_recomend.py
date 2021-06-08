@@ -85,7 +85,7 @@ def get_movies(liked_movie):
   d={}
   
   #                           only top 50 movies
-  for index,movie in enumerate(sorted_movie[:20]):
+  for index,movie in enumerate(sorted_movie[:21]):
     title=get_title_from_index(movie[0])
     img = get_posters(title)
     d[index]= [title,img]

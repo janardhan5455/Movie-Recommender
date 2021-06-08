@@ -8,12 +8,38 @@ Original file is located at
 """
 
 import pandas as pd
-
+import requests
+import pickle
 import numpy as np
 
 from sklearn.feature_extraction.text import CountVectorizer
 
 from sklearn.metrics.pairwise import cosine_similarity
+
+API_KEY="33e9c9280301152615256845d01b0821"
+
+def fetch_posters(movie):
+  url=f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={movie}&page=1&include_adult=false"
+  r = requests.get(url)
+  d = r.json()
+  path = d['results'][0]['poster_path']
+  return f"https://www.themoviedb.org/t/p/w600_and_h900_bestv2{path}"
+
+def get_posters(movie):
+  with open("movies_poster.pkl",'rb') as f:
+    movies_d=pickle.load(f)
+    if movie in movies_d:
+      return movies_d[movie]
+  
+  print(f"Fetching {movie}")
+  link = fetch_posters(movie)
+  movies_d[movie]=link
+  with open("movies_poster.pkl",'wb') as f:
+    pickle.dump(movies_d,f)
+  return link
+
+
+
 
 def get_title_from_index(index):
 	return df[df.index == index]["title"].values[0]
@@ -47,13 +73,15 @@ pop_movies=df_sorted[df_sorted['popularity']>50]
 
 pop_movies.count
 
-random=np.random.choice(pop_movies['index'],20)
-
-random
-
 d={}
-for index in random:
-  d[index]=get_title_from_index(index)
+def populer():
+  random=np.random.choice(pop_movies['index'],21)
+  d={}
+  for index in random:
+    title=get_title_from_index(index)
+    img = get_posters(title)
+    d[index]= [title,img]
+  return d
   
 print(d)
 

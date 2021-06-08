@@ -7,6 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1XLvGOqc2Tj5K40VXRmqil_QYkxhcnYoA
 """
 
+
 import pandas as pd
 
 import numpy as np
@@ -14,6 +15,34 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 
 from sklearn.metrics.pairwise import cosine_similarity
+
+import requests
+import time
+import pickle
+
+API_KEY="33e9c9280301152615256845d01b0821"
+
+def fetch_posters(movie):
+  url=f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={movie}&page=1&include_adult=false"
+  r = requests.get(url)
+  d = r.json()
+  path = d['results'][0]['poster_path']
+  return f"https://www.themoviedb.org/t/p/w600_and_h900_bestv2{path}"
+
+def get_posters(movie):
+  with open("movies_poster.pkl",'rb') as f:
+    movies_d=pickle.load(f)
+    if movie in movies_d:
+      return movies_d[movie]
+  
+  print(f"Fetching {movie}")
+  link = fetch_posters(movie)
+  movies_d[movie]=link
+  with open("movies_poster.pkl",'wb') as f:
+    pickle.dump(movies_d,f)
+  return link
+
+
 
 def get_title_from_index(index):
 	return df[df.index == index]["title"].values[0]
@@ -54,9 +83,12 @@ def get_movies(liked_movie):
   sorted_movie=sorted(sim_movies,key=lambda x:x[1],reverse=True)
 
   d={}
+  
   #                           only top 50 movies
-  for index,movie in enumerate(sorted_movie[:50]):
-    d[index]=get_title_from_index(movie[0])
+  for index,movie in enumerate(sorted_movie[:20]):
+    title=get_title_from_index(movie[0])
+    img = get_posters(title)
+    d[index]= [title,img]
 
   return d
 

@@ -24,7 +24,8 @@
 					{% for index,movie in movies.items() %}
 						
 						<div class="mt-4 ml-2">
-							<h1 class="is-size-4">{{index+1}}. {{movie}}</h1>
+							<h1 class="is-size-4">{{index+1}}. {{movie[0]}}</h1>
+							<img src={{movie[1]}} width="500"  >
 						</div>
 					  
 					{% endfor%}
